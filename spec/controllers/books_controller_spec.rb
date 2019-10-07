@@ -44,7 +44,7 @@ RSpec.describe BooksController, type: :controller do
 
   describe "GET #index" do
     it "returns a success response" do
-      Book.create! valid_attributes
+      create_book valid_attributes
       get :index, params: {}, session: valid_session
       expect(response).to be_successful
     end
@@ -52,7 +52,7 @@ RSpec.describe BooksController, type: :controller do
 
   describe "GET #show" do
     it "returns a success response" do
-      book = Book.create! valid_attributes
+      book = create_book valid_attributes
       get :show, params: {id: book.to_param}, session: valid_session
       expect(response).to be_successful
     end
@@ -67,7 +67,7 @@ RSpec.describe BooksController, type: :controller do
 
   describe "GET #edit" do
     it "returns a success response" do
-      book = Book.create! valid_attributes
+      book = create_book valid_attributes
       get :edit, params: {id: book.to_param}, session: valid_session
       expect(response).to be_successful
     end
@@ -83,7 +83,7 @@ RSpec.describe BooksController, type: :controller do
 
       it "redirects to the created book" do
         post :create, params: {book: valid_attributes}, session: valid_session
-        expect(response).to redirect_to(Book.last)
+        expect(response).to redirect_to(last(Book))
       end
     end
 
@@ -102,14 +102,14 @@ RSpec.describe BooksController, type: :controller do
       }
 
       it "updates the requested book" do
-        book = Book.create! valid_attributes
+        book = create_book valid_attributes
         put :update, params: {id: book.to_param, book: new_attributes}, session: valid_session
         book.reload
         skip("Add assertions for updated state")
       end
 
       it "redirects to the book" do
-        book = Book.create! valid_attributes
+        book = create_book valid_attributes
         put :update, params: {id: book.to_param, book: valid_attributes}, session: valid_session
         expect(response).to redirect_to(book)
       end
@@ -117,7 +117,7 @@ RSpec.describe BooksController, type: :controller do
 
     context "with invalid params" do
       it "returns a success response (i.e. to display the 'edit' template)" do
-        book = Book.create! valid_attributes
+        book = create_book valid_attributes
         put :update, params: {id: book.to_param, book: invalid_attributes}, session: valid_session
         expect(response).to be_successful
       end
@@ -126,17 +126,24 @@ RSpec.describe BooksController, type: :controller do
 
   describe "DELETE #destroy" do
     it "destroys the requested book" do
-      book = Book.create! valid_attributes
+      book = create_book valid_attributes
       expect {
         delete :destroy, params: {id: book.to_param}, session: valid_session
       }.to change(Book, :count).by(-1)
     end
 
     it "redirects to the books list" do
-      book = Book.create! valid_attributes
+      book = create_book valid_attributes
       delete :destroy, params: {id: book.to_param}, session: valid_session
       expect(response).to redirect_to(books_url)
     end
   end
 
+  def create_book(attributes)
+    Valkyrie.config.metadata_adapter.persister.save(resource: Book.new(attributes))
+  end
+
+  def last(model)
+    Valkyrie.config.metadata_adapter.query_service.find_all_of_model(model: model).to_a.last
+  end
 end
