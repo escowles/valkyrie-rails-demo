@@ -14,7 +14,7 @@ class BooksController < ApplicationController
 
   # GET /books/new
   def new
-    @book = Book.new
+    @book = BookChangeSet.new(Book.new)
   end
 
   # GET /books/1/edit
