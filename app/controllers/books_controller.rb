@@ -24,10 +24,13 @@ class BooksController < ApplicationController
   # POST /books
   # POST /books.json
   def create
-    @book = Book.new(book_params)
+    change_set = BookChangeSet.new(Book.new)
+    change_set.validate(book_params)
+    change_set.sync
+    @book = Valkyrie.config.metadata_adapter.persister.save(resource: change_set.resource)
 
     respond_to do |format|
-      if @book.save
+      if @book.persisted?
         format.html { redirect_to @book, notice: 'Book was successfully created.' }
         format.json { render :show, status: :created, location: @book }
       else
