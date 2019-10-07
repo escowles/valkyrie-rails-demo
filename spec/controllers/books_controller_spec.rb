@@ -34,7 +34,7 @@ RSpec.describe BooksController, type: :controller do
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    { foo: ["Bar"] }
   }
 
   # This should return the minimal set of values that should be in the session
@@ -88,9 +88,9 @@ RSpec.describe BooksController, type: :controller do
     end
 
     context "with invalid params" do
-      it "returns a success response (i.e. to display the 'new' template)" do
+      it "returns an unsuccessful response" do
         post :create, params: {book: invalid_attributes}, session: valid_session
-        expect(response).to be_successful
+        expect(response).not_to be_successful
       end
     end
   end
@@ -98,14 +98,14 @@ RSpec.describe BooksController, type: :controller do
   describe "PUT #update" do
     context "with valid params" do
       let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
+        { title: ["My Updated Book"] }
       }
 
       it "updates the requested book" do
         book = create_book valid_attributes
         put :update, params: {id: book.to_param, book: new_attributes}, session: valid_session
-        book.reload
-        skip("Add assertions for updated state")
+        updated_book = Valkyrie.config.metadata_adapter.query_service.find_by(id: book.id)
+        expect(updated_book.title).to eq(["My Updated Book"])
       end
 
       it "redirects to the book" do
@@ -116,10 +116,10 @@ RSpec.describe BooksController, type: :controller do
     end
 
     context "with invalid params" do
-      it "returns a success response (i.e. to display the 'edit' template)" do
+      it "returns a unsuccessful response" do
         book = create_book valid_attributes
         put :update, params: {id: book.to_param, book: invalid_attributes}, session: valid_session
-        expect(response).to be_successful
+        expect(response).not_to be_successful
       end
     end
   end

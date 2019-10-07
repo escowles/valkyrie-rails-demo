@@ -6,7 +6,11 @@ class Book < Valkyrie::Resource
   attribute :author, Valkyrie::Types::Set
   attribute :description, Valkyrie::Types::Set
 
+  def self.all
+    Valkyrie.config.metadata_adapter.query_service.find_all_of_model(model: self)
+  end
+
   def self.count
-    Valkyrie.config.metadata_adapter.query_service.find_all_of_model(model: self).count
+    all.count
   end
 end
